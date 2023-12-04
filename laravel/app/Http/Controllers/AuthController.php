@@ -22,14 +22,14 @@ class AuthController extends Controller
     public function proses_login(Request $request){
         $credentials =  $request->only('email','password');
         $validate = Validator::make($credentials,[
-            'email'=>'required|email',
+            'email'=>'required',
             'password'=>'required'
         ]);
         if($validate->fails()){
             return back()->withErrors($validate)->withInput();
+            
         }
-
-        if(Auth::attempt($credentials)){
+        if(Auth::attempt(array('email'=> $credentials['email'], 'password' => $credentials['password']))){
             return redirect()->intended('dashboard')->with('success','Successfully Login');
         }
         return redirect('login')->withInput()->withErrors(['login_error'=>'Username or password are wrong!']);
@@ -45,12 +45,11 @@ class AuthController extends Controller
     }
 
     public function proses_register(Request $request){
-
         $validate = Validator::make($request->all(),[
-            'fullname'=>'required',
+            'name'=>'required',
             'email'=>'required|email',
             'password'=>'required',
-            'password_confirm' => 'required|confirmed',
+            'password_confirm' => 'required|same:password',
         ]);
 
 
